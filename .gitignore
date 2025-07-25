@@ -1,0 +1,99 @@
+## Compilación y binarios
+bin/
+obj/
+*.exe
+*.dll
+*.pdb
+*.cache
+*.log
+*.tlog
+*.tmp
+*.bak
+
+## Archivos de Visual Studio
+.vs/
+*.suo
+*.user
+*.csproj.user
+*.dbmdl
+*.dbproj.schemaview
+*.pfx
+*.publishsettings
+*.psess
+*.vsp
+*.ncb
+*.sdf
+*.opensdf
+*.cachefile
+*.vspscc
+*.vssscc
+*.sln.docstates
+
+## Rider / JetBrains
+.idea/
+*.resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+## Configuraciones locales
+appsettings.json
+appsettings.Development.json
+secrets.json
+*.local.json
+.env
+.env.local
+
+## Paquetes y artefactos
+packages/
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## Publicaciones
+PublishProfiles/
+*.pubxml
+*.publish.xml
+
+## Bases de datos locales
+*.mdf
+*.ldf
+*.db
+*.sqlite
+*.sdf
+
+## Web y frontend
+node_modules/
+wwwroot/node_modules/
+bower_components/
+dist/
+tmp/
+temp/
+.cache/
+
+## Pruebas
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+*.testsettings
+*.vsmdi
+
+## SonarQube
+.sonar/
+
+## Docker
+*.pid
+docker-compose.override.yml
+
+## Sistema operativo
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.DS_Store
+
+## Otros
+*.swp
+*.orig
