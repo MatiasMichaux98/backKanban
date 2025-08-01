@@ -1,5 +1,6 @@
 ﻿using KanabanBack.Models;
 using KanabanBack.Models.DTOs.Board;
+using KanabanBack.Models.DTOs.List;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,12 +29,29 @@ namespace KanabanBack.Controllers
         [Route("{id}")]
         public async Task<IActionResult> GetBoardId (int id)
         {
-            var board = await _newkanbanContext.Boards.FindAsync(id);
+            var board = await _newkanbanContext.Boards
+                .Include(l => l.Lists)
+                .FirstOrDefaultAsync(board => board.BoardId == id);
             if(board == null)
             {
                 return NotFound(new { messege = "board no Encontrado" });
             }
-            return Ok(board);
+
+            var response = new BoardDtoResponse
+            {
+                BoardId = board.BoardId,
+                Nombre = board.Nombre,
+                CreatedAt = board.CreatedAt,
+                Lists = board.Lists.Select(l => new ListaDtoResponse
+                {
+                    ListId = l.ListId,
+                    Nombre = l.Nombre,
+                    Order = l.Order,
+                    BoardId = l.BoardId
+                }).ToList()
+            };
+
+            return Ok(response);
         }
 
         [HttpPost]
@@ -127,11 +145,16 @@ namespace KanabanBack.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                var boardDelete = await _newkanbanContext.Boards.FindAsync(id);
+                var boardDelete = await _newkanbanContext.Boards
+                    .Include(l => l.Lists)
+                    .ThenInclude(c => c.Cards)
+                    .FirstOrDefaultAsync(board => board.BoardId == id);
+
                 if (boardDelete == null)
                 {
                     return NotFound();
                 }
+
                 _newkanbanContext.Entry(boardDelete).State = EntityState.Deleted;
                 await _newkanbanContext.SaveChangesAsync();
 

@@ -1,4 +1,6 @@
-﻿namespace KanabanBack.Models.DTOs.Board
+﻿using KanabanBack.Models.DTOs.List;
+
+namespace KanabanBack.Models.DTOs.Board
 {
     public class BoardDtoResponse
     {
@@ -10,5 +12,6 @@
 
         public int? UsuarioId { get; set; }
 
+        public List<ListaDtoResponse> Lists { get; set; } = new();
     }
 }
