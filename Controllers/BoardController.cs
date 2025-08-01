@@ -93,7 +93,7 @@ namespace KanabanBack.Controllers
                 var UpdateBoard = await _newkanbanContext.Boards.FindAsync(id);
                 if (UpdateBoard == null)
                 {
-                    return NotFound(new { meseege = "Usuario no encontrado" });
+                    return NotFound(new { meseege = "board no encontrado" });
                 }
 
                 UpdateBoard.Nombre = request.Nombre;
