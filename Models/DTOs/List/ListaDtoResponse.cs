@@ -1,4 +1,6 @@
-﻿namespace KanabanBack.Models.DTOs.List
+﻿using KanabanBack.Models.DTOs.card;
+
+namespace KanabanBack.Models.DTOs.List
 {
     public class ListaDtoResponse
     {
@@ -6,7 +8,7 @@
         public string? Nombre { get; set; }
         public int Order { get; set; }
         public int? BoardId { get; set; }
-        //public List<CardDTOsResponse> Cards { get; set; } = new();
+        public List<CardDtoResponse> Cards { get; set; } = new();
 
     }
 }

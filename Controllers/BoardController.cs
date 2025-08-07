@@ -1,6 +1,8 @@
 ﻿using KanabanBack.Models;
 using KanabanBack.Models.DTOs.Board;
+using KanabanBack.Models.DTOs.card;
 using KanabanBack.Models.DTOs.List;
+using KanabanBack.Models.DTOs.Tag;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +33,8 @@ namespace KanabanBack.Controllers
         {
             var board = await _newkanbanContext.Boards
                 .Include(l => l.Lists)
+                .ThenInclude(c => c.Cards)
+                .ThenInclude(t => t.Tag)
                 .FirstOrDefaultAsync(board => board.BoardId == id);
             if(board == null)
             {
@@ -47,7 +51,19 @@ namespace KanabanBack.Controllers
                     ListId = l.ListId,
                     Nombre = l.Nombre,
                     Order = l.Order,
-                    BoardId = l.BoardId
+                    BoardId = l.BoardId,
+                    Cards = l.Cards.Select(c => new CardDtoResponse
+                    {
+                        CardId = c.CardId,
+                        Title = c.Title,
+                        Descripcion= c.Descripcion,
+                        ListId = c.ListId,
+                        Tag = c.Tag == null? null : new TagDtoResponse
+                        {
+                            Id = c.Tag.Id,
+                            Nombre = c.Tag.Nombre
+                        }
+                    }).ToList()
                 }).ToList()
             };
 
@@ -148,6 +164,7 @@ namespace KanabanBack.Controllers
                 var boardDelete = await _newkanbanContext.Boards
                     .Include(l => l.Lists)
                     .ThenInclude(c => c.Cards)
+                    .ThenInclude(t => t.Tag)
                     .FirstOrDefaultAsync(board => board.BoardId == id);
 
                 if (boardDelete == null)

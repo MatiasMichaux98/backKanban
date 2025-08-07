@@ -1,4 +1,6 @@
-﻿namespace KanabanBack.Models.DTOs.card
+﻿using KanabanBack.Models.DTOs.Tag;
+
+namespace KanabanBack.Models.DTOs.card
 {
     public class CardDtoResponse
     {
@@ -6,8 +8,10 @@
         public string? Title { get; set; }
         public int? ListId { get; set; }
         public string? Descripcion { get; set; }
-        public int? TagId { get; set; }
-        public string? TagNombre { get; set; }
+        public TagDtoResponse? Tag { get; set; }
+
+
+
 
     }
 }

@@ -5,5 +5,6 @@
         public string? Title { get; set; }
         public string? Descripcion { get; set; }
         public int ListId { get; set; }
+        public int? TagId { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using KanabanBack.Models.DTOs.card;
+using KanabanBack.Models.DTOs.Tag;
 
 namespace KanabanBack.Controllers
 {
@@ -21,7 +22,9 @@ namespace KanabanBack.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCards()
         {
-            var cards = await _newkanbanContext.Cards.ToListAsync();
+            var cards = await _newkanbanContext.Cards
+                .Include(t => t.Tag)
+                .ToListAsync();
             if (cards == null) return NotFound();
             return Ok(cards);
         }
@@ -30,7 +33,9 @@ namespace KanabanBack.Controllers
         [Route("{id}")]
         public async Task<IActionResult> GetCardId(int id)
         {
-            var card = await _newkanbanContext.Cards.FindAsync(id);
+            var card = await _newkanbanContext.Cards
+                .Include(t => t.Tag)
+                .FirstOrDefaultAsync(card => card.CardId == id);
                 
             if (card == null)
             {
@@ -43,7 +48,11 @@ namespace KanabanBack.Controllers
                 Title = card.Title,
                 Descripcion = card.Descripcion,
                 ListId = card.ListId,
-                
+                Tag = card.Tag == null ? null : new TagDtoResponse
+                {
+                    Id = card.Tag.Id,
+                    Nombre = card.Tag.Nombre
+                }
             };
 
             return Ok(response);
@@ -59,29 +68,43 @@ namespace KanabanBack.Controllers
                 {
                     return BadRequest();
                 }
+                var listExists = await _newkanbanContext.Lists.AnyAsync(l => l.ListId == request.ListId);
+                if (!listExists)
+                    return BadRequest($"No existe la lista con ListId = {request.ListId}");
+
                 var newCard = new Card
                 {
                     Title = request.Title,
                     Descripcion = request.Descripcion,
-                    ListId = request.ListId
+                    ListId = request.ListId,
+                    TagId = request.TagId
                     //UsuarioId = request.UsuarioId
                 };
                 _newkanbanContext.Add(newCard);
                 await _newkanbanContext.SaveChangesAsync();
 
+                var cardWithTag = await _newkanbanContext.Cards
+                    .Include(c => c.Tag)
+                    .FirstOrDefaultAsync(c => c.CardId == newCard.CardId);
                 var response = new CardDtoResponse
                 {
-                    Title = request.Title,
-                    Descripcion = request.Descripcion,
-                    ListId = request.ListId,
+                    CardId = newCard.CardId,
+                    Title = newCard.Title,
+                    Descripcion = newCard.Descripcion,
+                    ListId = newCard.ListId,
+                    Tag = newCard.Tag == null ? null : new TagDtoResponse
+                    {
+                        Id = newCard.Tag.Id,
+                        Nombre = newCard.Tag.Nombre
+                    }
                 };
 
                 return Ok(response);
-
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Ocurrio un error en el servidor" + ex.Message);
+                return StatusCode(500, $"Error interno: {ex.Message} - {ex.StackTrace}");
+
             }
         }
 
@@ -103,15 +126,25 @@ namespace KanabanBack.Controllers
 
                 UpdateCard.Title = request.Title;
                 UpdateCard.Descripcion = request.Descripcion;
+                UpdateCard.TagId = request.TagId;
 
                 _newkanbanContext.Entry(UpdateCard).State = EntityState.Modified;
                 await _newkanbanContext.SaveChangesAsync();
 
+                var cardWithTag = await _newkanbanContext.Cards
+                    .Include(c => c.Tag)
+                    .FirstOrDefaultAsync(c => c.CardId == UpdateCard.CardId);
                 var response = new CardDtoResponse
                 {
-                    Title = request.Title,
-                    Descripcion = request.Descripcion,
-                    ListId = request.ListId,
+                    Title = cardWithTag.Title,
+                    Descripcion = cardWithTag.Descripcion,
+                    ListId = cardWithTag.ListId,
+                    Tag = cardWithTag.Tag == null ? null : new TagDtoResponse
+                    {
+                        Id = cardWithTag.Tag.Id,
+                        Nombre = cardWithTag.Tag.Nombre
+                    }
+
                 };
 
                 return Ok(response);
@@ -132,7 +165,9 @@ namespace KanabanBack.Controllers
                 {
                     return BadRequest(ModelState);
                 }
-                var cardDelete = await _newkanbanContext.Cards.FindAsync(id);
+                var cardDelete = await _newkanbanContext.Cards
+                    .Include(t => t.Tag)
+                    .FirstOrDefaultAsync(card => card.CardId == id);
                     
 
                 if (cardDelete == null)
