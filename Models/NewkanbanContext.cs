@@ -54,7 +54,7 @@ public partial class NewkanbanContext : DbContext
 
             entity.HasOne(d => d.List).WithMany(p => p.Cards)
                 .HasForeignKey(d => d.ListId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK__Card__ListId__5441852A");
 
             entity.HasOne(d => d.Tag).WithMany(p => p.Cards)
@@ -98,7 +98,7 @@ public partial class NewkanbanContext : DbContext
 
             entity.HasOne(d => d.Board).WithMany(p => p.Lists)
                 .HasForeignKey(d => d.BoardId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK__List__BoardId__4F7CD00D");
         });
 
@@ -113,6 +113,7 @@ public partial class NewkanbanContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("nombre");
+     
         });
 
         modelBuilder.Entity<User>(entity =>
